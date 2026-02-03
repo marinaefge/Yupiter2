@@ -1,19 +1,44 @@
-# Xray Manager
+# Updated xray_manager.py
 
-class XrayManager:
-    def __init__(self, config):
-        self.config = config
+import configparser
+import requests
+
+class XrayConnectionManager:
+    def __init__(self, config_file):
+        self.config = configparser.ConfigParser()
+        self.config.read(config_file)
+
+    def connect_vpn(self):
+        # Logic to manage VPN connection
+        # e.g., establishing a VPN based on the config settings
+        pass
+
+    def connect_proxy(self):
+        # Logic to manage Proxy connection settings
+        proxy = self.config['proxy']
+        # e.g., setting up requests to use proxy
+        proxies = {
+            'http': f"http://{proxy['username']}:{proxy['password']}@{proxy['host']}:{proxy['port']}",
+            'https': f"http://{proxy['username']}:{proxy['password']}@{proxy['host']}:{proxy['port']}"
+        }
+        return proxies
+
+    def generate_config(self):
+        # Generate configuration file code
+        with open('xray_config.ini', 'w') as configfile:
+            self.config.write(configfile)
+        return 'xray_config.ini'
 
     def connect(self):
-        """Establishes a connection to Xray based on the configuration."""
-        # Here you'd implement the connection logic
-        print(f"Connecting to Xray with configuration: {self.config}")
+        # Connect using either VPN or Proxy based on the configuration
+        if self.config.getboolean('connection', 'use_vpn'):
+            self.connect_vpn()
+        else:
+            proxies = self.connect_proxy()
+            response = requests.get(self.config['url']['endpoint'], proxies=proxies)
+        return response
 
-    def manage_configuration(self, new_config):
-        """Updates the Xray configuration."""
-        self.config = new_config
-        print(f"Updated Xray configuration: {self.config}")
-
-# Example usage:
-# xray_manager = XrayManager(config={'url': 'http://example.com', 'api_key': 'your_api_key'})
-# xray_manager.connect()
+# Example usage
+manager = XrayConnectionManager('config.ini')
+response = manager.connect()
+print(response)
