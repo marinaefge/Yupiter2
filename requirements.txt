@@ -1,6 +1,8 @@
-# Python Dependencies
+# Requirements
 
-flask
+# Add your necessary Python dependencies below.
 numpy
 pandas
 requests
+flask
+# additional dependencies can be added here
